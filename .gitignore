@@ -129,4 +129,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# P"roject specific stuff
+# Project specific stuff
+chat_log.txt

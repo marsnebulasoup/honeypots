@@ -3,6 +3,24 @@
 ConversationalAI test in Node.js with GPT-3 in the CLI
 
 ## Running
+Run 
+```
+npm run prep
+```
+to install dependencies & build, and
+```
+npm run dev
+```
+to launch.
+
+To watch for changes and build on save, run
+```
+tsc -w
+```
+-----
+
+OR you can install everything manually:
+
 ### Dependencies
 Install TypeScript globally (ignore if already installed)
 ```

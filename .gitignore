@@ -131,3 +131,5 @@ dist
 
 # Project specific stuff
 chat_log.txt
+ts-built
+.vscode

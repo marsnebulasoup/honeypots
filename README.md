@@ -17,6 +17,8 @@ To watch for changes and build on save, run
 ```
 tsc -w
 ```
+**Don't forget your `.env` file!**
+
 -----
 
 OR you can install everything manually:

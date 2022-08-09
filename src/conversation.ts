@@ -1,7 +1,9 @@
+import { AIResponseValidationError } from './validator';
 import { Configuration } from "openai";
 import { AIPersonalityDetails } from "./personality";
-import { AIProvider as AIClient } from "./client";
+import { AIProvider as AIClient, AIProviderEmptyResponseError, AIProviderRequestFailedError } from "./client";
 import { MAX_PROMPT_LENGTH } from "./constants";
+import { AIResponseSanitizer } from "./sanitizer";
 
 export class AIConversation {
   private _personality: AIPersonalityDetails;
@@ -40,13 +42,27 @@ export class AIConversation {
       body: message,
     }));
 
-    // console.log(`\n--BEGI-\n${this._prompt.toString()}\n----END--\n`);
+    // console.log(`\n--BEGIN-\n${this._prompt.toString()}\n----END--\n`);
 
+    try {
+      const responseString = await this._aiClient.getResponse(this._prompt);
 
-    response = await this._aiClient.getResponse(this._prompt);
+      response.body = new AIResponseSanitizer({
+        message: responseString,
+        personality: this._personality,
+      }).sanitize();
 
-    this._conversation.addMessage(response);
-
+      this._conversation.addMessage(response);
+    } catch (e) {
+      // TODO: Properly handle these errors rather than just displaying them.
+      if (e instanceof AIProviderRequestFailedError) {
+        response.body = `AI request failed. Message: '${e.message}'`;
+      } else if (e instanceof AIProviderEmptyResponseError) {
+        response.body = `AI returned an empty response.`;
+      } else if (e instanceof AIResponseValidationError) {
+        response.body = e.message;
+      }
+    }
     return response.body;
   }
 }

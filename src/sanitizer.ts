@@ -1,7 +1,8 @@
+import { AIResponseValidator } from './validator';
 import { AIPersonalityDetails } from "./personality";
 
 // AI response post-processor
-export class AIResponseDishwasher {
+export class AIResponseSanitizer {
   private _message: string;
   private _personality: AIPersonalityDetails;
   constructor({ message, personality }: { message: string; personality: AIPersonalityDetails; }) {
@@ -9,25 +10,25 @@ export class AIResponseDishwasher {
     this._personality = personality;
   }
 
-  private _trimLeadingName(name: string): AIResponseDishwasher {
+  private _trimLeadingName(name: string): AIResponseSanitizer {
     this._message.replace(`${name}: `, "").trim();
     return this
   }
 
-  public trimWhitespace(): AIResponseDishwasher {
+  public trimWhitespace(): AIResponseSanitizer {
     this._message = this._message.trim();
     return this;
   }
 
-  public trimLeadingAIName(): AIResponseDishwasher {
+  public trimLeadingAIName(): AIResponseSanitizer {
     return this._trimLeadingName(this._personality.name)
   }
 
-  public trimLeadingRecipientName(): AIResponseDishwasher {
+  public trimLeadingRecipientName(): AIResponseSanitizer {
     return this._trimLeadingName(this._personality.recipientName)
   }
 
-  public trimTrailingEOL(): AIResponseDishwasher {
+  public trimTrailingEOL(): AIResponseSanitizer {
     this._message = this._message.replace(/__eol__/g, "");
     return this
   }
@@ -37,7 +38,13 @@ export class AIResponseDishwasher {
   }
 
   public sanitize(): string {
-    return this      
+    try {
+      new AIResponseValidator({ message: this._message, personality: this._personality }).isValid();
+    } catch (e) {
+      throw e;
+    }
+
+    return this
       .trimLeadingAIName()
       .trimLeadingRecipientName()
       .trimTrailingEOL()

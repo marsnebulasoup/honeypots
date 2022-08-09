@@ -17,7 +17,7 @@ const configuration = new Configuration({
 const ai = new AIConversation({
   personality: {
     name: "Daniel",
-    recipientName: "User",
+    recipientName: "George",
     description: "Daniel is a friend that enjoys hockey and lives in Canada. Daniel is a bit grumpy, and is always mad at the neighborhood kids, for making too much noise.",
   },
   configuration,

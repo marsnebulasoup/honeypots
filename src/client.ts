@@ -2,6 +2,7 @@ import { AIConversationPrompt, Message } from './conversation';
 import { DEFAULT_AI_SETTINGS } from './constants';
 import { AIPersonalityDetails } from './personality';
 import { Configuration, CreateCompletionRequest, OpenAIApi } from "openai";
+import { AIResponseDishwasher } from './dishwasher';
 
 export class AIProvider {
   private _openAIApi: OpenAIApi;
@@ -19,8 +20,7 @@ export class AIProvider {
       stop: [ // max of 4 stop words or this will fail
         `${this._personality.name}:`,
         `${this._personality.recipientName}: `,
-        ".\n",
-        "?\n",
+        "__eol__\n",
       ],
     }
   };
@@ -32,14 +32,19 @@ export class AIProvider {
       body: "RESPONSE PLACEHOLDER - THIS IS NOT FROM OPENAI",
     });
 
-    try {     
+    try {
       const rawResponse = await this._openAIApi.createCompletion({
         prompt: prompt.toString(),
         ...this._aiSettings,
       });
       // Format response, etc      
-      const responseString = rawResponse.data.choices[0].text.trim();
-      message.body = responseString.replace(this._personality.name, "").trim();
+      // console.log(JSON.stringify(rawResponse.data, null, 2));
+
+      const responseString = rawResponse.data?.choices[0]!?.text
+      message.body = new AIResponseDishwasher({
+        message: responseString,
+        personality: this._personality,
+      }).sanitize();
     } catch (e) {
       console.error(e.message);
     }

@@ -11,7 +11,7 @@ export const DEFAULT_AI_SETTINGS: CreateCompletionRequest = {
   model: CURIE,
   temperature: 0.75,
   top_p: 1,
-  frequency_penalty: 0,
-  presence_penalty: 0.5,
-  max_tokens: 150,
+  frequency_penalty: 1,
+  presence_penalty: 1.2,
+  max_tokens: 1000,
 }

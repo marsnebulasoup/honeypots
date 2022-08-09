@@ -133,3 +133,5 @@ dist
 chat_log.txt
 ts-built
 .vscode
+data/dailydialog
+data/prep

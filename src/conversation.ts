@@ -40,7 +40,7 @@ export class AIConversation {
       body: message,
     }));
 
-    // console.log(`\n--BEGIN----\n${this._prompt.toString()}\n----END--\n`);
+    // console.log(`\n--BEGI-\n${this._prompt.toString()}\n----END--\n`);
 
 
     response = await this._aiClient.getResponse(this._prompt);
@@ -105,6 +105,6 @@ export class Message {
   }
 
   public toString(): string {
-    return `${this.sender}: ${this.body}`;
+    return `${this.sender}: ${this.body} __eol__`;
   }
 }

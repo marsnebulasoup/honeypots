@@ -1,9 +1,9 @@
 import { CreateCompletionRequest } from "openai";
 
-const DA_VINCI = "text-davinci-002";      // Best (most expensive) engine
-const CURIE = "text-curie-001";
-const BABBAGE = "text-babbage-001";
-const ADA = "text-ada-001";               // Worst (cheapest) AI engine
+export const DA_VINCI = "text-davinci-002";      // Best (most expensive) engine
+export const CURIE = "text-curie-001";
+export const BABBAGE = "text-babbage-001";
+export const ADA = "text-ada-001";               // Worst (cheapest) AI engine
 
 export const MAX_PROMPT_LENGTH = 10; // max number of messages to send to OpenAI per request
 

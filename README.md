@@ -45,7 +45,7 @@ tsc
 to build once.
 
 ### Running
-Run `ts-built/ai.js`
+Run `ts-built/ai/ai_demo.js`
 ```
-node ts-built/ai.js
+node ts-built/ai/ai_demo.js
 ```

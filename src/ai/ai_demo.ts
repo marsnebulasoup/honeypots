@@ -1,5 +1,5 @@
 import { AIConversation } from './conversation';
-import { Configuration, OpenAIApi, CreateCompletionRequest } from "openai";
+import { Configuration } from "openai";
 import { config } from "dotenv";
 import input from 'input';
 

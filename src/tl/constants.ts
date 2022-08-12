@@ -1,0 +1,1 @@
+export const CONNECTION_RETRIES = 5;

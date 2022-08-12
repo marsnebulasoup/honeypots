@@ -4,6 +4,7 @@
       "target": "ES2015",
       "outDir": "ts-built",
       "rootDir": "src",
-      "sourceMap": true
+      "sourceMap": true,
+      "esModuleInterop": true
   }
 }

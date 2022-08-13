@@ -12,9 +12,9 @@ export class AIConversation {
   private _conversation: ConversationHistory;
   private _aiClient: AIClient;
 
-  constructor({ personality, configuration }: { personality: AIPersonalityDetails, configuration: Configuration; }) {
+  constructor({ personality, conversation, configuration }: { personality: AIPersonalityDetails, conversation: ConversationHistory, configuration: Configuration; }) {
     this._personality = personality;
-    this._conversation = new ConversationHistory();
+    this._conversation = conversation;
     this._aiClient = new AIClient({
       personality,
       configuration,

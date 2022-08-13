@@ -1,4 +1,4 @@
-import { AIConversation } from './conversation';
+import { AIClient } from './client';
 import { Configuration } from "openai";
 import { config } from "dotenv";
 import input from 'input';
@@ -15,7 +15,7 @@ const configuration = new Configuration({
   apiKey: API_KEY,
 });
 const conversation = new ConversationHistory();
-const ai = new AIConversation({
+const ai = new AIClient({
   personality: {
     name: "Daniel",
     recipientName: "George",

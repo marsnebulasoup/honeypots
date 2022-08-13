@@ -1,5 +1,5 @@
 import { AIResponseValidator } from './validator';
-import { AIPersonalityDetails } from "./personality";
+import { AIPersonalityDetails } from "./personality-details";
 
 // AI response post-processor
 export class AIResponseSanitizer {

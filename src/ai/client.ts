@@ -1,63 +1,98 @@
-import { AIConversationPrompt } from './conversation';
-import { DEFAULT_AI_SETTINGS } from './constants';
-import { AIPersonalityDetails } from './personality';
-import { Configuration, CreateCompletionRequest, CreateCompletionResponse, OpenAIApi } from "openai";
-import { AxiosResponse } from 'axios';
+import { AIResponseValidationError } from './validator';
+import { Configuration } from "openai";
+import { AIPersonalityDetails } from "./personality-details";
+import { AIProvider as AIProvider, AIProviderEmptyResponseError, AIProviderRequestFailedError } from "./provider";
+import { MAX_PROMPT_LENGTH } from "./constants";
+import { AIResponseSanitizer } from "./sanitizer";
+import { Message } from '../models/message';
+import { ConversationHistory } from '../models/conversation-history';
 
-export class AIProvider {
-  private _openAIApi: OpenAIApi;
+export class AIClient {
   private _personality: AIPersonalityDetails;
+  private _conversation: ConversationHistory;
+  private _aiProvider: AIProvider;
 
-  constructor({ personality, configuration }: { personality: AIPersonalityDetails; configuration: Configuration; }) {
-    this._openAIApi = new OpenAIApi(configuration);
+  constructor({ personality, conversation, configuration }: { personality: AIPersonalityDetails, conversation: ConversationHistory, configuration: Configuration; }) {
     this._personality = personality;
+    this._conversation = conversation;
+    this._aiProvider = new AIProvider({
+      personality,
+      configuration,
+    });
   }
 
-  private get _aiSettings(): CreateCompletionRequest {
-    return {
-      ...DEFAULT_AI_SETTINGS,
-      stop: [ // max of 4 stop words or this will fail
-        `${this._personality.name}:`,
-        `${this._personality.recipientName}: `,
-        "__eol__",
-      ],
-    }
-  };
+  private get _prompt(): AIConversationPrompt {
+    return new AIConversationPrompt({
+      personality: this._personality,
+      conversation: this._conversation,
+    });
+  }
 
-  public async getResponse(prompt: AIConversationPrompt): Promise<string> {
-    let
-      message: string,
-      rawResponse: AxiosResponse<CreateCompletionResponse, any>;
+  public get conversationHistory(): ConversationHistory {
+    return this._conversation;
+  }
+
+  public async talk(message: string): Promise<string> {
+    let response = new Message({
+      sender: this._personality.name,
+      body: "NO RESPONSE",
+    });
+
+
+    this._conversation.addMessage(new Message({
+      sender: this._personality.recipientName,
+      body: message,
+    }));
+
+    // console.log(`\n--BEGIN-\n${this._prompt.toString()}\n----END--\n`);
 
     try {
-      rawResponse = await this._openAIApi.createCompletion({
-        prompt: prompt.toString(),
-        ...this._aiSettings,
-      });
-    }
-    catch (e) {
-      console.error(e.message);
-      throw new AIProviderRequestFailedError(e.message);
-    }
+      const responseString = await this._aiProvider.getResponse(this._prompt);
 
+      response.body = new AIResponseSanitizer({
+        message: responseString,
+        personality: this._personality,
+      }).sanitize();
 
-    message = rawResponse?.data?.choices?.[0]?.text;
-    if (!message) {
-      throw new AIProviderEmptyResponseError("Response was empty.");
+      this._conversation.addMessage(response);
+    } catch (e) {
+      // TODO: Properly handle these errors rather than just displaying them.
+      if (e instanceof AIProviderRequestFailedError) {
+        response.body = `AI request failed. Message: '${e.message}'`;
+      } else if (e instanceof AIProviderEmptyResponseError) {
+        response.body = `AI returned an empty response.`;
+      } else if (e instanceof AIResponseValidationError) {
+        response.body = e.message;
+      }
     }
-
-    return message;
+    return response.body;
   }
 }
 
-export class AIProviderRequestFailedError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
+export class AIConversationPrompt {
+  private _prompt: string;
+  private _personality: AIPersonalityDetails;
+  constructor({ personality, conversation }: { personality: AIPersonalityDetails; conversation: ConversationHistory; }) {
+    this._personality = personality;
+    this._prompt = [
+      this._description,
 
-export class AIProviderEmptyResponseError extends Error {
-  constructor(message: string) {
-    super(message);
+      ``,
+
+      ...conversation.messages
+        .slice(-MAX_PROMPT_LENGTH) // only send last 10 messages
+        .map(message => message.toString()), // convert to strings
+
+      `${this._personality.name}: `
+
+    ].join("\n");
+  }
+
+  private get _description(): string {
+    return `The following is a conversation between ${this._personality.recipientName} and ${this._personality.name}. ${this._personality.description}`
+  }
+
+  public toString(): string {
+    return this._prompt;
   }
 }

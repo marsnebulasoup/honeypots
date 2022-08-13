@@ -4,6 +4,8 @@ import { Api, TelegramClient } from 'telegram';
 import { StringSession } from 'telegram/sessions';
 import { BigInteger } from 'big-integer';
 import { EntityLike } from 'telegram/define';
+import { Message } from '../models/message';
+import { ConversationHistory } from '../models/conversation-history';
 
 export class TLClient {
   private _apiId: number;
@@ -96,19 +98,57 @@ export class TLClient {
     );
   }
 
-  async getMessageHistory(id: EntityLike, limit: number) {
+  async getFirstNameById(id: EntityLike): Promise<string> {
     if (await this.isReady) {
-      const result: Api.messages.TypeMessages = await this._client.invoke(new Api.messages.GetHistory({
-        peer: id,
-        // offsetId: 43,
-        // offsetDate: 43,
-        // addOffset: 0,
-        limit: limit,
-        // maxId: 0,
-        // minId: 0,
-        // hash: BigInt('-4156887774564')
-      }));
-      return result
+      const users: Api.TypeUser[] = await this._client.invoke(
+        new Api.users.GetUsers({
+          id: [id],
+        })
+      );
+      const user = users
+        .filter((user): user is Api.User & { firstName: string } => true)
+        .find(user => user.firstName);
+
+      return user?.firstName || "No first name"; // TODO: Handle no first name
+    } else {
+      throw new TLClientNotReadyError();
+    }
+  }
+
+  async getMyName(): Promise<string> {
+    if (await this.isReady) {
+      return this.getFirstNameById(new Api.InputUserSelf())
+    } else {
+      throw new TLClientNotReadyError();
+    }
+  }
+
+  async getMessageHistory({ id, limit }: { id: Api.InputPeerUser; limit: number; }): Promise<ConversationHistory> {
+    if (await this.isReady) {
+      let messages: Message[] = [];
+      const history: Api.messages.TypeMessages = await this._client.invoke(
+        new Api.messages.GetHistory({
+          peer: id,
+          limit: limit,
+        })
+      );
+
+      if ("messages" in history) {
+        const myName: string = await this.getMyName();
+        const theirName: string = await this.getFirstNameById(id);
+        messages = history.messages
+          .filter((message): message is Api.Message & { peerId: Api.PeerUser } => true)
+          .map(message => {
+            return new Message({
+              sender: message.fromId
+                ? /* me */ myName
+                : /* them */ theirName,
+              body: message.message,
+            })
+          })
+          .reverse();
+      }
+      return new ConversationHistory(messages);
     } else {
       throw new TLClientNotReadyError();
     }

@@ -4,15 +4,17 @@ import { AIPersonalityDetails } from "./personality";
 import { AIProvider as AIClient, AIProviderEmptyResponseError, AIProviderRequestFailedError } from "./client";
 import { MAX_PROMPT_LENGTH } from "./constants";
 import { AIResponseSanitizer } from "./sanitizer";
+import { Message } from '../models/message';
+import { ConversationHistory } from '../models/conversation-history';
 
 export class AIConversation {
   private _personality: AIPersonalityDetails;
-  private _conversation: AIConversationHistory;
+  private _conversation: ConversationHistory;
   private _aiClient: AIClient;
 
   constructor({ personality, configuration }: { personality: AIPersonalityDetails, configuration: Configuration; }) {
     this._personality = personality;
-    this._conversation = new AIConversationHistory();
+    this._conversation = new ConversationHistory();
     this._aiClient = new AIClient({
       personality,
       configuration,
@@ -26,7 +28,7 @@ export class AIConversation {
     });
   }
 
-  public get conversationHistory(): AIConversationHistory {
+  public get conversationHistory(): ConversationHistory {
     return this._conversation;
   }
 
@@ -70,7 +72,7 @@ export class AIConversation {
 export class AIConversationPrompt {
   private _prompt: string;
   private _personality: AIPersonalityDetails;
-  constructor({ personality, conversation }: { personality: AIPersonalityDetails; conversation: AIConversationHistory; }) {
+  constructor({ personality, conversation }: { personality: AIPersonalityDetails; conversation: ConversationHistory; }) {
     this._personality = personality;
     this._prompt = [
       this._description,
@@ -92,35 +94,5 @@ export class AIConversationPrompt {
 
   public toString(): string {
     return this._prompt;
-  }
-}
-
-export class AIConversationHistory {
-  private _messages: Message[];
-
-  constructor(messages?: Message[]) {
-    this._messages = messages || [];
-  }
-
-  public get messages(): Message[] {
-    return this._messages;
-  }
-
-  public addMessage(message: Message): void {
-    this._messages.push(message);
-  }
-}
-
-export class Message {
-  public body: string;
-  public sender: string;
-
-  constructor({ body, sender }: { body: string; sender: string; }) {
-    this.body = body;
-    this.sender = sender;
-  }
-
-  public toString(): string {
-    return `${this.sender}: ${this.body} __eol__`;
   }
 }

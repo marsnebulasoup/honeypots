@@ -1,4 +1,4 @@
-import { AIConversationPrompt, Message } from './conversation';
+import { AIConversationPrompt } from './conversation';
 import { DEFAULT_AI_SETTINGS } from './constants';
 import { AIPersonalityDetails } from './personality';
 import { Configuration, CreateCompletionRequest, CreateCompletionResponse, OpenAIApi } from "openai";

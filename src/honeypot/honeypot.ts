@@ -2,7 +2,7 @@ import { ConversationHistory } from '../models/conversation-history';
 import { TLClient } from '../tl/client';
 import { AIClient } from '../ai/client';
 import { Api } from 'telegram';
-import { GET_CONFIG, MESSAGE_HISTORY_LIMIT, PERSONALITY } from './constants';
+import { GET_CONFIG, MESSAGE_HISTORY_LIMIT, GET_PERSONALITY } from './constants';
 import { Message } from '../models/message';
 
 export class HoneyPot {
@@ -27,7 +27,7 @@ export class HoneyPot {
       limit: MESSAGE_HISTORY_LIMIT,
     });
     const aiClient = new AIClient({
-      personality: PERSONALITY(await tlClient.getMyName(), await tlClient.getFirstNameById(chatId)),
+      personality: GET_PERSONALITY(await tlClient.getMyName(), await tlClient.getFirstNameById(chatId)),
       conversation: conversationHistory,
       configuration: GET_CONFIG(),
     });

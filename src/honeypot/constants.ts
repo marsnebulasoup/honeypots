@@ -4,7 +4,7 @@ import { AIPersonalityDetails } from "../ai/personality-details";
 
 export const MESSAGE_HISTORY_LIMIT = 10;
 
-export const PERSONALITY = (name, recipientName): AIPersonalityDetails => {
+export const GET_PERSONALITY = (name, recipientName): AIPersonalityDetails => {
   return {
     name,
     recipientName,

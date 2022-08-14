@@ -3,6 +3,7 @@ import { TLClient } from '../tl/client';
 import { AIClient } from '../ai/client';
 import { Api } from 'telegram';
 import { GET_CONFIG, MESSAGE_HISTORY_LIMIT, PERSONALITY } from './constants';
+import { Message } from '../models/message';
 
 export class HoneyPot {
   private _aiClient: AIClient;
@@ -58,8 +59,6 @@ export class HoneyPot {
     });
   }
 
-  // TODO: It may be a good idea to check the message history every time a new message is received in case the user has sent a message of their own.
-  // Or we could subscribe to messages sent by the user and add them to the conversation history.
   private async _onNewMessage(event: Api.UpdateShortMessage): Promise<void> {
     if (this._isActive) { // checks if the honeypot is still active
       if (event?.userId?.toString() == this._chatId.userId?.toString()) { // checks if the message is in the right chat
@@ -83,6 +82,12 @@ export class HoneyPot {
           }
           console.groupEnd();
         } else { // new message sent by user, add it to the conversation history
+          this._conversationHistory.addMessage(
+            new Message({
+              sender: await this._tlClient.getMyName(),
+              body: event.message,
+            })
+          );
         }
       }
     }

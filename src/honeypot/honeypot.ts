@@ -64,6 +64,7 @@ export class HoneyPot {
     // TODO: AI responds to your own messages
     if (this._isActive) {
       if (event?.userId?.toString() == this._chatId.userId?.toString()) {
+        console.log("");
         console.group(`${this._chatId.userId}`)
         console.log(`Received new message from ${this._chatId.userId}: '${event.message}'`);
         const message = event?.message;

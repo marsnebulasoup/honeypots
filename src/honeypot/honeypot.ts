@@ -27,7 +27,7 @@ export class HoneyPot {
       limit: MESSAGE_HISTORY_LIMIT,
     });
     const aiClient = new AIClient({
-      personality: PERSONALITY(await tlClient.getMyName(), await tlClient.getFirstNameById(chatId)), // TODO: Get recipient name and user name from TL
+      personality: PERSONALITY(await tlClient.getMyName(), await tlClient.getFirstNameById(chatId)),
       conversation: conversationHistory,
       configuration: GET_CONFIG(),
     });
@@ -43,7 +43,6 @@ export class HoneyPot {
 
   public async destroy(): Promise<void> {
     console.log(`Destroying HoneyPot for ${this._chatId.userId}`);
-    // await this._tlClient.unsubscribe({...  // TODO: Unsubscribe from new messages
     this._isActive = false;
   }
 

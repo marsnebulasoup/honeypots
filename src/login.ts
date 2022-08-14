@@ -34,7 +34,7 @@ export class TLInit {
     }
     const client = new TLClient({ apiId, apiHash, session });
     await client.init({
-      getPhoneNumberIfNeeded: async () => await input.text("Enter phone number: "),
+      getPhoneNumberIfNeeded: async () => await input.text("Enter phone number (with country code, e.g. +1): "),
       getPasswordIfNeeded: async () => await input.text("Enter password: "),
       getPhoneCodeIfNeeded: async () => await input.text("Enter phone code: "),
     });

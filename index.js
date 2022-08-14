@@ -42,7 +42,7 @@ BABBAGE = "text-babbage-001";
 ADA = "text-ada-001";               // Worst (cheapest) AI engine
 ENGINE_TYPE = DA_VINCI;             // Which engine to use
 NAME = "Jarvis";                    // Name of AI "person"
-MAX_PROMPT_LENGTH = 10;             // TODO: Prompt should not be too long but it needs to include 0th array member
+MAX_PROMPT_LENGTH = 10;             // TODO: Prompt should not be too long
 
 
 // Read from a file

@@ -44,7 +44,7 @@ export class AIClient {
       body: message,
     }));
 
-    // console.log(`\n--BEGIN-\n${this._prompt.toString()}\n----END--\n`);
+    console.log(`\n--BEGIN-\n${this._prompt.toString()}\n----END--\n`);
 
     try {
       const responseString = await this._aiProvider.getResponse(this._prompt);

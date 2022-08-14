@@ -78,7 +78,7 @@ export class TLClient {
     }
   }
 
-  async getFolderIdByName(name: string): Promise<number> {
+  async getFolderIdByName(name: string): Promise<number | undefined> {
     if (await this.isReady) {
       const folders: Api.TypeDialogFilter[] = await this._client.invoke(new Api.messages.GetDialogFilters());
       const folder: Api.TypeDialogFilter = folders.find(folder => "title" in folder && folder.title == name)

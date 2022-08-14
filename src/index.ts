@@ -5,7 +5,7 @@ import { InputPeerUserArray } from './tl/input-peer-user-array';
 import { Api } from 'telegram';
 
 const ENV_FILE_PATH = ".tl.env"
-const AI_FOLDER_NAME = "FOLDER_TEST";
+const AI_FOLDER_NAME = "HONEYPOT";
 
 const saveCredentials = (apiId, apiHash, session) => {
   fs.writeFileSync(ENV_FILE_PATH, [
@@ -25,19 +25,13 @@ const saveCredentials = (apiId, apiHash, session) => {
 
   const refreshHoneyPots = async () => {
     // Remove honeypots not in the scammer folder
-
-    console.log(scammerUserIds);
-
     honeypots = honeypots.filter((honeypot, index) => {
       const isInFolder = scammerUserIds.includes(honeypot.chatId);
-      console.log(`${honeypot.chatId.userId} is in folder: ${isInFolder}`);
       if(!isInFolder) {
         honeypot.destroy();
       }
       return isInFolder;
     });
-
-    console.log(honeypots);
 
     // Add any new honeypots
     scammerUserIds.forEach(async (user) => {

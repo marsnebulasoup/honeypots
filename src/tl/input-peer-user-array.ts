@@ -8,7 +8,7 @@ export class InputPeerUserArray extends Array<Api.InputPeerUser> {
   }
 
   includes(searchElement: Api.InputPeerUser, fromIndex?: number): boolean {
-    return this.slice(fromIndex).some(id => id.userId === searchElement.userId);
+    return this.slice(fromIndex).some(id => id.userId.toString() === searchElement.userId.toString());
   }
 
   includesId(searchElement: BigInteger, fromIndex?: number): boolean {   

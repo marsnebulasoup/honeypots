@@ -61,7 +61,29 @@ export class HoneyPot {
   // TODO: It may be a good idea to check the message history every time a new message is received in case the user has sent a message of their own.
   // Or we could subscribe to messages sent by the user and add them to the conversation history.
   private async _onNewMessage(event: Api.UpdateShortMessage): Promise<void> {
+    if (this._isActive) { // checks if the honeypot is still active
+      if (event?.userId?.toString() == this._chatId.userId?.toString()) { // checks if the message is in the right chat
+        if (event?.out === false) { // checks if the message not outgoing (i.e. incoming)
           console.log("");
+          console.group(`${this._chatId.userId}`)
+          console.log(`Received new message from ${this._chatId.userId}: '${event.message}'`);
+          const message = event?.message;
+          if (message) {
+            try {
+              const aiResponse = await this._aiClient.talk(message);
+              await this._sleep(1000);
+              console.log(`Sending AI response: '${aiResponse}'`);
+              await this._tlClient.sendMessage({
+                id: this._chatId.userId,
+                body: aiResponse,
+              });
+            } catch (e) {
+              console.error(e);
+            }
+          }
+          console.groupEnd();
+        } else { // new message sent by user, add it to the conversation history
+        }
       }
     }
   }

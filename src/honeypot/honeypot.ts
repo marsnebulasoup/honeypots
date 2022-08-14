@@ -81,7 +81,7 @@ export class HoneyPot {
             }
           }
           console.groupEnd();
-        } else { // new message sent by user, add it to the conversation history
+        } else { // new message is outgoing, i.e., sent by user - add it to the conversation history
           this._conversationHistory.addMessage(
             new Message({
               sender: await this._tlClient.getMyName(),

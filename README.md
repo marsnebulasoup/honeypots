@@ -18,6 +18,9 @@ To watch for changes and build on save, run
 tsc -w
 ```
 **Don't forget your `.env` file!**
+```
+OPENAI_API_KEY=sk-ocDAZ...
+```
 
 -----
 
@@ -45,7 +48,7 @@ tsc
 to build once.
 
 ### Running
-Run `ts-built/ai/ai_demo.js`
+Run `ts-built/demo.js`
 ```
-node ts-built/ai/ai_demo.js
+node ts-built/demo.js
 ```

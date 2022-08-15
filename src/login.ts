@@ -28,7 +28,7 @@ export class TLInit {
       session = new StringSession(SESSION || "");
     }
     else {
-      apiId = await input.text("Enter API Id: ");
+      apiId = Number(await input.text("Enter API Id: "));
       apiHash = await input.text("Enter API hash: ");
       session = new StringSession("");
     }

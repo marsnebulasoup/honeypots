@@ -49,10 +49,8 @@ export class HoneyPots {
   private async _onFolderUpdate(_: Api.UpdateDialogFilter): Promise<void> {
     if (this._isActive) {
       this._hpFolderId = await this._tlClient.getFolderIdByName(this._hpFolderName); // search for folder id in case it was deleted or hasn't been created yet
-      if (this._hpFolderId) {
-        this._hpUserIds = await this._tlClient.getPeersInFolder(this._hpFolderId);
-        await this._refreshHoneyPots();
-      }
+      this._hpUserIds = await this._tlClient.getPeersInFolder(this._hpFolderId);
+      await this._refreshHoneyPots();
     }
   }
 

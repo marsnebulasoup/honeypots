@@ -1,9 +1,10 @@
+import { Configuration } from 'openai';
 import { ConversationHistory } from '../models/conversation-history';
 import { TLClient } from '../tl/client';
 import { AIClient } from '../ai/client';
 import { Api } from 'telegram';
-import { GET_CONFIG, MESSAGE_HISTORY_LIMIT, GET_PERSONALITY } from './constants';
 import { Message } from '../models/message';
+import { AIPersonalityDetails } from '../ai/personality-details';
 
 export class HoneyPot {
   private _aiClient: AIClient;
@@ -20,23 +21,34 @@ export class HoneyPot {
     this._isActive = true;
   }
 
-  public static async create({ tlClient, chatId }: { tlClient: TLClient; chatId: Api.InputPeerUser; }): Promise<HoneyPot> {
+  public static async create({ tlClient, chatId, config }: { tlClient: TLClient; chatId: Api.InputPeerUser; config: HoneyPotConfig }): Promise<HoneyPot> {
     console.log(`Creating HoneyPot for ${chatId.userId}`);
-    const conversationHistory: ConversationHistory = await tlClient.getMessageHistory({
-      id: chatId,
-      limit: MESSAGE_HISTORY_LIMIT,
-    });
-    const aiClient = new AIClient({
-      personality: GET_PERSONALITY(await tlClient.getMyName(), await tlClient.getFirstNameById(chatId)),
-      conversation: conversationHistory,
-      configuration: GET_CONFIG(),
-    });
-    const honeypot = new HoneyPot({
-      aiClient: aiClient,
-      tlClient: tlClient,
-      conversationHistory: conversationHistory,
-      chatId: chatId,
-    });
+    const
+      name: string = await tlClient.getMyName(),
+      recipientName: string = await tlClient.getFirstNameById(chatId),
+
+      conversationHistory: ConversationHistory = await tlClient.getMessageHistory({
+        id: chatId,
+        limit: config.messageHistoryLimit,
+      }),
+
+      aiClient: AIClient = new AIClient({
+        personality: {
+          name: name,
+          recipientName: recipientName,
+          description: config.personality(name, recipientName),
+        },
+        conversation: conversationHistory,
+        configuration: config.openai,
+      }),
+
+      honeypot: HoneyPot = new HoneyPot({
+        aiClient: aiClient,
+        tlClient: tlClient,
+        conversationHistory: conversationHistory,
+        chatId: chatId,
+      });
+
     await honeypot._subscribeToNewMessages();
     return honeypot;
   }
@@ -96,4 +108,10 @@ export class HoneyPot {
     console.log(`Sleeping for ${ms}ms`);
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+}
+
+export interface HoneyPotConfig {
+  openai: Configuration;
+  messageHistoryLimit: number;
+  personality: (name: string, recipientName: string) => string;
 }

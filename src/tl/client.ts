@@ -81,16 +81,16 @@ export class TLClient {
   async getFolderIdByName(name: string): Promise<number | undefined> {
     if (await this.isReady) {
       const folders: Api.TypeDialogFilter[] = await this._client.invoke(new Api.messages.GetDialogFilters());
-      const folder: Api.TypeDialogFilter = folders.find(folder => "title" in folder && folder.title == name)
+      const folder: Api.TypeDialogFilter | undefined = folders.find(folder => "title" in folder && folder.title == name)
       return folder && ("id" in folder ? folder.id : undefined);
     } else {
       throw new TLClientNotReadyError();
     }
   }
 
-  async getPeersInFolder(id: number): Promise<InputPeerUserArray> {
+  async getPeersInFolder(id: number | undefined): Promise<InputPeerUserArray> {
     const folders: Api.TypeDialogFilter[] = await this._client.invoke(new Api.messages.GetDialogFilters());
-    const folder: Api.TypeDialogFilter = folders.find(folder => "id" in folder && folder.id == id)
+    const folder: Api.TypeDialogFilter | undefined = folders.find(folder => "id" in folder && folder.id == id)
     return new InputPeerUserArray(
       ...folder && "includePeers" in folder
         ? folder.includePeers.filter((peer): peer is Api.InputPeerUser => "userId" in peer) //flatMap((peer) => "userId" in peer ? [peer.userId] : []) // Get all userIds from the folder

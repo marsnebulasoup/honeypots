@@ -1,7 +1,8 @@
-*
+*.*
 
-!*/*
-!src
+node_modules/
+dist/
+
 !*.ts
 !*.js
 !*.json

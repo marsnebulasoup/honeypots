@@ -21,7 +21,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prep": "npm install typescript@latest -g && npm install && tsc",
-    "dev": "tsc && node ts-built/demo.js"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

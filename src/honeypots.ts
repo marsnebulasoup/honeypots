@@ -1,19 +1,21 @@
 import { Api } from "telegram";
-import { HoneyPot } from "./honeypot/honeypot";
+import { HoneyPot, HoneyPotConfig } from "./honeypot/honeypot";
 import { TLClient } from "./tl/client";
 import { InputPeerUserArray } from "./tl/input-peer-user-array";
 
 export class HoneyPots {
   private _honeypots: HoneyPot[] = [];
+  private _hpConfig: HoneyPotsConfig;
   private _hpFolderName: string;
-  private _hpFolderId: number;
+  private _hpFolderId: number | undefined;
   private _hpUserIds: InputPeerUserArray;
   private _tlClient: TLClient;
   private _isActive: boolean;
   private _isSubscribed: boolean;
 
-  constructor({ client, honeypotFolderName }: { client: TLClient; honeypotFolderName: string; }) {
+  constructor({ client, honeypotFolderName, config }: { client: TLClient; honeypotFolderName: string; config: HoneyPotsConfig; }) {
     this._tlClient = client;
+    this._hpConfig = config;
     this._hpFolderName = honeypotFolderName;
     this._hpUserIds = new InputPeerUserArray();
     this._isActive = false;
@@ -46,7 +48,7 @@ export class HoneyPots {
     this._onFolderUpdate(null);
   }
 
-  private async _onFolderUpdate(_: Api.UpdateDialogFilter): Promise<void> {
+  private async _onFolderUpdate(_: Api.UpdateDialogFilter | null): Promise<void> {
     if (this._isActive) {
       this._hpFolderId = await this._tlClient.getFolderIdByName(this._hpFolderName); // search for folder id in case it was deleted or hasn't been created yet
       this._hpUserIds = await this._tlClient.getPeersInFolder(this._hpFolderId);
@@ -71,6 +73,7 @@ export class HoneyPots {
           await HoneyPot.create({
             tlClient: this._tlClient,
             chatId: user,
+            config: this._hpConfig.honeypotConfig,
           })
         );
       }
@@ -80,4 +83,8 @@ export class HoneyPots {
   private _isAHoneyPot(chatId: Api.InputPeerUser): boolean {
     return !!this._honeypots.find(honeypot => honeypot.chatId.userId.toString() == chatId.userId.toString());
   }
+}
+
+interface HoneyPotsConfig {
+  honeypotConfig: HoneyPotConfig;
 }

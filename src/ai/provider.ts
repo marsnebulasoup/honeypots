@@ -35,13 +35,13 @@ export class AIProvider {
         ...this._aiSettings,
       });
     }
-    catch (e) {
+    catch (e: any) {
       console.error(e.message);
       throw new AIProviderRequestFailedError(e.message);
     }
 
 
-    message = rawResponse?.data?.choices?.[0]?.text;
+    message = rawResponse?.data?.choices?.[0]?.text || "";
     if (!message) {
       throw new AIProviderEmptyResponseError("Response was empty.");
     }

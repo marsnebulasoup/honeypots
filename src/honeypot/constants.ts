@@ -4,15 +4,7 @@ import { AIPersonalityDetails } from "../ai/personality-details";
 
 export const MESSAGE_HISTORY_LIMIT = 10;
 
-export const GET_PERSONALITY = (name, recipientName): AIPersonalityDetails => {
-  return {
-    name,
-    recipientName,
-    get description() {
-      return `${this.name} is a friend that enjoys hockey and lives in Canada. ${this.name} is a bit grumpy, and is always mad at the neighborhood kids, for making too much noise.`
-    }
-  }
-}
+
 
 export const GET_CONFIG = (): Configuration => {
   const ENV_FILE_PATH = ".env"

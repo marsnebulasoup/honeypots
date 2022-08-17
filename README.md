@@ -4,7 +4,7 @@ Conversational AI for Telegram built in Node.js with OpenAI's GPT-3 API.
 
 ## Usage
 
-```
+``` typescript
 import { TLClient } from './tl/client';
 import { StringSession } from "telegram/sessions";
 

@@ -1,4 +1,4 @@
-# OpenAI ConversationalAI in Node.js
+# HoneyPots
 
 Conversational AI for Telegram built in Node.js with OpenAI's GPT-3 API.
 

@@ -1,2 +1,0 @@
-User: hi there
-Jarvis: Hello! How are you today?

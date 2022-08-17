@@ -2,6 +2,8 @@
 
 Conversational AI for Telegram built in Node.js with OpenAI's GPT-3 API.
 
+The idea is that a user adds a chat to a specific folder in Telegram, and the AI will begin responding to it.
+
 ## Usage
 
 ``` typescript

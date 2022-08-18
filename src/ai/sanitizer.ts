@@ -38,6 +38,7 @@ export class AIResponseSanitizer {
   }
 
   public sanitize(): string {
+    // eslint-disable-next-line no-useless-catch
     try {
       new AIResponseValidator({ message: this._message, personality: this._personality }).isValid();
     } catch (e) {

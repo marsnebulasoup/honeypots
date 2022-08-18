@@ -22,12 +22,10 @@ export class AIProvider {
         "__eol__",
       ],
     }
-  };
+  }
 
   public async getResponse(prompt: AIConversationPrompt): Promise<string> {
-    let
-      message: string,
-      rawResponse: AxiosResponse<CreateCompletionResponse, any>;
+    let rawResponse: AxiosResponse<CreateCompletionResponse, any>;
 
     try {
       rawResponse = await this._openAIApi.createCompletion({
@@ -41,7 +39,7 @@ export class AIProvider {
     }
 
 
-    message = rawResponse?.data?.choices?.[0]?.text || "";
+    const message = rawResponse?.data?.choices?.[0]?.text || "";
     if (!message) {
       throw new AIProviderEmptyResponseError("Response was empty.");
     }

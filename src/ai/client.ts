@@ -33,7 +33,7 @@ export class AIClient {
   }
 
   public async talk(message: string): Promise<string> {
-    let response = new Message({
+    const response = new Message({
       sender: this._personality.name,
       body: "NO RESPONSE",
     });

@@ -1,7 +1,7 @@
 import { Api } from "telegram";
-import { HoneyPot, HoneyPotConfig } from "./honeypot/honeypot";
-import { TLClient } from "./tl/client";
-import { InputPeerUserArray } from "./tl/input-peer-user-array";
+import { HoneyPot, HoneyPotConfig } from "./honeypot";
+import { TLClient } from "../tl/client";
+import { InputPeerUserArray } from "../tl/input-peer-user-array";
 
 export class HoneyPots {
   private _honeypots: HoneyPot[] = [];

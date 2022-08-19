@@ -13,8 +13,8 @@ export class HoneyPots {
   private _isActive: boolean;
   private _isSubscribed: boolean;
 
-  constructor({ client, honeypotFolderName, config }: { client: TLClient; honeypotFolderName: string; config: HoneyPotsConfig; }) {
-    this._tlClient = client;
+  constructor({ tlClient, honeypotFolderName, config }: { tlClient: TLClient; honeypotFolderName: string; config: HoneyPotsConfig; }) {
+    this._tlClient = tlClient;
     this._hpConfig = config;
     this._hpFolderName = honeypotFolderName;
     this._hpUserIds = new InputPeerUserArray();
@@ -85,6 +85,6 @@ export class HoneyPots {
   }
 }
 
-interface HoneyPotsConfig {
+export interface HoneyPotsConfig {
   honeypotConfig: HoneyPotConfig;
 }

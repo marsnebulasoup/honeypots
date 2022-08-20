@@ -6,6 +6,7 @@ import { BigInteger } from 'big-integer';
 import { EntityLike } from 'telegram/define';
 import { Message } from '../models/message';
 import { ConversationHistory } from '../models/conversation-history';
+import { FloodError, RPCError } from 'telegram/errors';
 
 export class TLClient {
   private _apiId: number;
@@ -20,6 +21,7 @@ export class TLClient {
 
     this._client = new TelegramClient(session, apiId, apiHash, {
       connectionRetries: CONNECTION_RETRIES,
+      testServers: true
     });
   }
 
@@ -41,7 +43,24 @@ export class TLClient {
       password: getPasswordIfNeeded,
       phoneCode: getPhoneCodeIfNeeded,
       onError: (e) => {
-        throw new TLClientAuthFailedError(`Authentication Failed. Message: ${e.message}`);
+        let humanReadableMessage = "Authentication Failed. Please try again.";
+        console.error(e);
+        if (e instanceof FloodError) {
+          humanReadableMessage = `Flood wait error. Please wait a while before trying again.`;
+        } else if (e instanceof RPCError) {
+          if (e.message.includes("PHONE_CODE_INVALID")) {
+            humanReadableMessage = "Incorrect verification code. Please try again.";
+          } else if (e.message.includes("PHONE_NUMBER_INVALID")) {
+            humanReadableMessage = "Phone number is invalid. Please try again.";
+          } else if (e.message.includes("PHONE_NUMBER_UNOCCUPIED")) {
+            humanReadableMessage = "Phone number not registered. Please try again.";
+          } else if (e.message.includes("SESSION_PASSWORD_NEEDED")) {
+            humanReadableMessage = "Password required. Please try again.";
+          } else if (e.message.includes("API_ID_INVALID")) {
+            humanReadableMessage = "Invalid API ID. Please try again.";
+          }
+        }
+        throw new TLClientAuthFailedError(`Authentication Failed. Message: ${e.message}`, humanReadableMessage);
       },
     });
   }
@@ -156,8 +175,10 @@ export class TLClient {
 }
 
 export class TLClientAuthFailedError extends Error {
-  constructor(message?: string) {
+  humanReadableMessage: string;
+  constructor(message?: string, humanReadableMessage?: string) {
     super(message || "Authentication Failed");
+    this.humanReadableMessage = humanReadableMessage || "Authentication failed.";
   }
 }
 

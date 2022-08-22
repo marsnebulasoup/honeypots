@@ -11,17 +11,39 @@ export class HoneyPot {
   private _tlClient: TLClient;
   private _conversationHistory: ConversationHistory;
   private _chatId: Api.InputPeerUser;
+  private _onUpdate: () => Promise<void>;
+  private _config: HoneyPotConfig;
+  private _name: string;
+  private _recipientName: string;
   private _isActive: boolean;
 
-  private constructor({ aiClient, tlClient, conversationHistory, chatId }: { aiClient: AIClient; tlClient: TLClient; conversationHistory: ConversationHistory, chatId: Api.InputPeerUser; }) {
+  private constructor({ aiClient, tlClient, conversationHistory, chatId, onUpdate, config, name, recipientName }: {
+    aiClient: AIClient;
+    tlClient: TLClient;
+    conversationHistory: ConversationHistory;
+    chatId: Api.InputPeerUser;
+    onUpdate: () => Promise<void>;
+    config: HoneyPotConfig;
+    name: string;
+    recipientName: string;
+  }) {
     this._aiClient = aiClient;
     this._tlClient = tlClient;
     this._conversationHistory = conversationHistory;
     this._chatId = chatId;
+    this._onUpdate = onUpdate;
+    this._config = config;
+    this._name = name;
+    this._recipientName = recipientName;
     this._isActive = true;
   }
 
-  public static async create({ tlClient, chatId, config }: { tlClient: TLClient; chatId: Api.InputPeerUser; config: HoneyPotConfig }): Promise<HoneyPot> {
+  public static async create({ tlClient, chatId, onUpdate, config }: {
+    tlClient: TLClient;
+    chatId: Api.InputPeerUser;
+    onUpdate: () => Promise<void>;
+    config: HoneyPotConfig
+  }): Promise<HoneyPot> {
     console.log(`Creating HoneyPot for ${chatId.userId}`);
     const
       name: string = await tlClient.getMyName(),
@@ -40,6 +62,10 @@ export class HoneyPot {
         },
         conversation: conversationHistory,
         configuration: config.openai,
+        options: {
+          messageHistoryLimit: config.messageHistoryLimit,
+          aiModel: config.aiModel,
+        }
       }),
 
       honeypot: HoneyPot = new HoneyPot({
@@ -47,6 +73,10 @@ export class HoneyPot {
         tlClient: tlClient,
         conversationHistory: conversationHistory,
         chatId: chatId,
+        onUpdate: onUpdate,
+        config: config,
+        name: name,
+        recipientName: recipientName,
       });
 
     await honeypot._subscribeToNewMessages();
@@ -60,6 +90,22 @@ export class HoneyPot {
 
   public get chatId(): Api.InputPeerUser {
     return this._chatId;
+  }
+
+  public get conversationHistory(): ConversationHistory {
+    return this._conversationHistory;
+  }
+
+  public get name(): string {
+    return this._name;
+  }
+
+  public get recipientName(): string {
+    return this._recipientName;
+  }
+
+  public get isActive(): boolean {
+    return this._isActive;
   }
 
   private async _subscribeToNewMessages(): Promise<void> {
@@ -81,6 +127,7 @@ export class HoneyPot {
           if (message) {
             try {
               const aiResponse = await this._aiClient.talk(message);
+              this._onUpdate();
               await this._sleep(1000);
               console.log(`Sending AI response: '${aiResponse}'`);
               await this._tlClient.sendMessage({
@@ -100,6 +147,7 @@ export class HoneyPot {
             })
           );
         }
+        this._onUpdate(); // notify parent that the conversation history has been updated
       }
     }
   }
@@ -111,6 +159,7 @@ export class HoneyPot {
 }
 
 export interface HoneyPotConfig {
+  aiModel: string;
   openai: Configuration;
   messageHistoryLimit: number;
   personality: (name: string, recipientName: string) => string;

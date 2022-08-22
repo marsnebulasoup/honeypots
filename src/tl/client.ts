@@ -21,7 +21,7 @@ export class TLClient {
 
     this._client = new TelegramClient(session, apiId, apiHash, {
       connectionRetries: CONNECTION_RETRIES,
-      testServers: true
+      // testServers: true
     });
   }
 

@@ -11,20 +11,24 @@ export class AIClient {
   private _personality: AIPersonalityDetails;
   private _conversation: ConversationHistory;
   private _aiProvider: AIProvider;
+  private _options: AIOptions;
 
-  constructor({ personality, conversation, configuration }: { personality: AIPersonalityDetails, conversation: ConversationHistory, configuration: Configuration; }) {
+  constructor({ personality, conversation, configuration, options }: { personality: AIPersonalityDetails, conversation: ConversationHistory, configuration: Configuration; options: AIOptions }) {
     this._personality = personality;
     this._conversation = conversation;
     this._aiProvider = new AIProvider({
       personality,
       configuration,
+      options
     });
+    this._options = options;
   }
 
   private get _prompt(): AIConversationPrompt {
     return new AIConversationPrompt({
       personality: this._personality,
       conversation: this._conversation,
+      options: this._options,
     });
   }
 
@@ -72,15 +76,18 @@ export class AIClient {
 export class AIConversationPrompt {
   private _prompt: string;
   private _personality: AIPersonalityDetails;
-  constructor({ personality, conversation }: { personality: AIPersonalityDetails; conversation: ConversationHistory; }) {
+  private _options: AIOptions;
+
+  constructor({ personality, conversation, options }: { personality: AIPersonalityDetails; conversation: ConversationHistory; options: AIOptions }) {
     this._personality = personality;
+    this._options = options;
     this._prompt = [
       this._description,
 
       ``,
 
       ...conversation.messages
-        .slice(-MAX_PROMPT_LENGTH) // only send last 10 messages
+        .slice(-Math.abs(options.messageHistoryLimit)) // only send last n messages
         .map(message => message.toString()), // convert to strings
 
       `${this._personality.name}: `
@@ -95,4 +102,9 @@ export class AIConversationPrompt {
   public toString(): string {
     return this._prompt;
   }
+}
+
+export interface AIOptions {
+  messageHistoryLimit: number;
+  aiModel: string;
 }

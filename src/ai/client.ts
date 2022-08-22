@@ -68,6 +68,8 @@ export class AIClient {
       } else if (e instanceof AIResponseValidationError) {
         response.body = e.message;
       }
+
+      throw(e);
     }
     return response.body;
   }

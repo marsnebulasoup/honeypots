@@ -4,7 +4,8 @@ import { TLClient } from '../tl/client';
 import { AIClient } from '../ai/client';
 import { Api } from 'telegram';
 import { Message } from '../models/message';
-import { AIPersonalityDetails } from '../ai/personality-details';
+import { AIProviderEmptyResponseError, AIProviderRequestFailedError } from '../ai/provider';
+import { AIResponseValidationError } from '../ai/validator';
 
 export class HoneyPot {
   private _aiClient: AIClient;
@@ -136,6 +137,13 @@ export class HoneyPot {
               });
             } catch (e) {
               console.error(e);
+              if (e instanceof AIProviderRequestFailedError) {
+                console.warn(`AI request failed. Message: '${e.message}'`);
+              } else if (e instanceof AIProviderEmptyResponseError) {
+                console.warn(`AI returned an empty response.`);
+              } else if (e instanceof AIResponseValidationError) {
+                console.warn(e.message);
+              }
             }
           }
           console.groupEnd();

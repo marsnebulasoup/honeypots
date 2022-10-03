@@ -2,7 +2,7 @@
 
 Conversational AI for Telegram built in Node.js with OpenAI's GPT-3 API. Built to fight scam.
 
-[View the demo.](https://honeychat-dashboard.onrender.com/#/)
+[View a basic demo.](https://honeychat-dashboard.onrender.com/#/)
 
 Flow:
  - user logs into Telegram

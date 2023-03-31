@@ -61,15 +61,19 @@ export class AIClient {
       this._conversation.addMessage(response);
     } catch (e) {
       // TODO: Properly handle these errors rather than just displaying them.
+      let message = `Unknown error`;
       if (e instanceof AIProviderRequestFailedError) {
-        response.body = `AI request failed. Message: '${e.message}'`;
+        message = `AI request failed. Message: '${e.message}'`
       } else if (e instanceof AIProviderEmptyResponseError) {
-        response.body = `AI returned an empty response.`;
+        message = `AI returned an empty response.`;
       } else if (e instanceof AIResponseValidationError) {
-        response.body = e.message;
+        message = e.message;
       }
 
-      throw(e);
+      console.error(message);
+      // response.body = message; // if you want to send the errors back as messages...
+
+      throw (e);
     }
     return response.body;
   }

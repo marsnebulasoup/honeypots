@@ -6,6 +6,8 @@ import { Api } from 'telegram';
 import { Message } from '../models/message';
 import { AIProviderEmptyResponseError, AIProviderRequestFailedError } from '../ai/provider';
 import { AIResponseValidationError } from '../ai/validator';
+import random, { RNG, Random } from 'random'
+import seedrandom from 'seedrandom'
 
 export class HoneyPot {
   private _aiClient: AIClient;
@@ -17,6 +19,7 @@ export class HoneyPot {
   private _name: string;
   private _recipientName: string;
   private _isActive: boolean;
+  private _random: Random;
 
   private constructor({ aiClient, tlClient, conversationHistory, chatId, onUpdate, config, name, recipientName }: {
     aiClient: AIClient;
@@ -37,6 +40,7 @@ export class HoneyPot {
     this._name = name;
     this._recipientName = recipientName;
     this._isActive = true;
+    this._random = random.clone(new Date().getTime());
   }
 
   public static async create({ tlClient, chatId, onUpdate, config }: {
@@ -162,13 +166,9 @@ export class HoneyPot {
 
   private async _sleep(): Promise<void> {
     console.log(`Min sleep time: ${this._config.minSleepTime} | Max sleep time: ${this._config.maxSleepTime}`)
-    const ms = this.randomInteger(this._config.minSleepTime, this._config.maxSleepTime) * 1000;
+    const ms = this._random.int(this._config.minSleepTime, this._config.maxSleepTime);
     console.log(`Sleeping for ${ms}ms`);
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  private randomInteger(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
 

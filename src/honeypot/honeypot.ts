@@ -129,7 +129,7 @@ export class HoneyPot {
             try {
               const aiResponse = await this._aiClient.talk(message);
               this._onUpdate();
-              await this._sleep(1000);
+              await this._sleep();
               console.log(`Sending AI response: '${aiResponse}'`);
               await this._tlClient.sendMessage({
                 id: this._chatId.userId,
@@ -160,9 +160,15 @@ export class HoneyPot {
     }
   }
 
-  private async _sleep(ms: number): Promise<void> {
+  private async _sleep(): Promise<void> {
+    console.log(`Min sleep time: ${this._config.minSleepTime} | Max sleep time: ${this._config.maxSleepTime}`)
+    const ms = this.randomInteger(this._config.minSleepTime, this._config.maxSleepTime);
     console.log(`Sleeping for ${ms}ms`);
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  private randomInteger(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 }
 
@@ -170,5 +176,7 @@ export interface HoneyPotConfig {
   aiModel: string;
   openai: Configuration;
   messageHistoryLimit: number;
+  minSleepTime: number;
+  maxSleepTime: number;
   personality: (name: string, recipientName: string) => string;
 }

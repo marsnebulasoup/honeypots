@@ -162,7 +162,7 @@ export class HoneyPot {
 
   private async _sleep(): Promise<void> {
     console.log(`Min sleep time: ${this._config.minSleepTime} | Max sleep time: ${this._config.maxSleepTime}`)
-    const ms = this.randomInteger(this._config.minSleepTime, this._config.maxSleepTime);
+    const ms = this.randomInteger(this._config.minSleepTime, this._config.maxSleepTime) * 1000;
     console.log(`Sleeping for ${ms}ms`);
     return new Promise(resolve => setTimeout(resolve, ms));
   }
